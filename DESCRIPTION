@@ -1,0 +1,11 @@
+Package: IMDtools
+Type: Package
+Title: Just some helper functions for GWAS summary statistics handling
+Version: 1.0.0
+Author: Guillermo Reales
+Maintainer: Guillermo Reales <gr440@cam.ac.uk>
+Description: Just some wrenches for day to day struggle
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.0

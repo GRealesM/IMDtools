@@ -1,0 +1,9 @@
+{
+    "path" : "~/rds/rds-cew54-wallace-share/Data/Tidy_GWAS-summary/IMDtools",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
