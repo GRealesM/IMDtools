@@ -16,7 +16,7 @@
 linORscale <- function(beta, se,N0,N1){
 	cp  <- N1/(N0+N1) 
 	BETA  <- beta/(cp * (1-cp))
-	SE  <- SE/(cp * (1-cp))
+	SE  <- se/(cp * (1-cp))
 	list(BETA,SE)
 }
 
