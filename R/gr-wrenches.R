@@ -12,6 +12,7 @@
 ##' @param N0 number of controls in the study.
 ##' @param N1 number of cases in the study.
 ##' @return a list containing beta and se.beta in log-odds scale.
+##' @export
 linORscale <- function(beta, se,N0,N1){
 	cp  <- N1/(N0+N1) 
 	BETA  <- BETA/(cp * (1-cp))
@@ -40,6 +41,7 @@ linORscale <- function(beta, se,N0,N1){
 ##' @param n sample size
 ##' @return a list containing adjusted Beta and SE by estimated standard deviation of Y
 ##' @author Guillermo Reales, Chris Wallace
+##' @export
 sdY.correction <- function(beta, se, maf, n) {
     if(length(beta) != length(maf) | length(se) != length(maf)) stop("Beta, SE and/or MAF are not the same length")
     oneover <- 1/se^2
