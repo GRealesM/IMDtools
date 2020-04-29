@@ -16,8 +16,7 @@ linORscale <- function(beta, se,N0,N1){
 	cp  <- N1/(N0+N1) 
 	BETA  <- BETA/(cp * (1-cp))
 	SE  <- SE/(cp * (1-cp))
-	ORscaled  <- list(BETA,SE)
-	return(ORscaled)
+	list(BETA,SE)
 }
 
 ##' Estimate trait standard deviation given vectors of variance of coefficients, MAF and sample size, and correct BETA and SE.
@@ -52,8 +51,7 @@ sdY.correction <- function(beta, se, maf, n) {
     message("Estimated sdY is ", cf)
     BETA  <- beta/sqrt(cf)
     SE  <- se/sqrt(cf)
-    adj.BETASE  <- list(BETA,SE)
-    return(adj.BETASE)
+    list(BETA,SE)
 }
 
 
