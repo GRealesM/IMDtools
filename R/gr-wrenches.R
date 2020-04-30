@@ -50,7 +50,7 @@ sdY.correction <- function(beta, se, maf, n) {
     cf <- coef(m)[['oneover']]
     if(cf < 0)
         stop("estimated sdY is negative - this can happen with small datasets, or those with errors.  A reasonable estimate of sdY is required to continue.")
-    message("Estimated sdY is ", cf)
+    message("Estimated sdY is ", sqrt(cf))
     BETA  <- beta/sqrt(cf)
     SE  <- se/sqrt(cf)
     list(BETA,SE)
