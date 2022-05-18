@@ -22,9 +22,9 @@ a list containing adjusted Beta and SE by estimated standard deviation of Y
 Estimate trait standard deviation given vectors of variance of coefficients, MAF and sample size, and correct BETA and SE.
 }
 \details{
-For studies of quantitative traits, measurements can come in different scales, leading to 
+For studies of quantitative traits, measurements can come in different scales, leading to
 differences in standard deviation of the effects.
-This function estimates the trait standard deviation from MAF and sample size, and by dividing beta and se 
+This function estimates the trait standard deviation from MAF and sample size, and by dividing beta and se
 by this estimate we can make var.beta = 1, thus making different datasets of quantitative traits in different
 scales comparable.
 

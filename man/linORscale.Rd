@@ -23,6 +23,6 @@ Convert effect sizes and standard error from linear to log-odds scale
 }
 \details{
 Binary traits in case-control studies can be analysed by BOLT-LMM, which uses a linear model.
-This function provides an approximation from linear to log-odds scale for Beta and SE, 
+This function provides an approximation from linear to log-odds scale for Beta and SE,
 as described in BOLT-LMM manual (https://data.broadinstitute.org/alkesgroup/BOLT-LMM/).
 }
