@@ -130,57 +130,54 @@ g.class  <- function(x, y, flip_strand=TRUE){
 #' @export
 #'
 g.align <- function(ds, manifest){
+        # Copy both datasets
+		d <- copy(ds)
+		man <- copy(manifest)
+		
+		if(!all(sapply(list(d,man), is.data.table))){
+			d <- data.table(d)
+			man <- data.table(man)
+		}
+		# Sanity checks. We'll require these columns initially
+		mincold <- c("CHR38", "BP38","REF","ALT", "BETA", "SE", "P")
+		if(!all(mincold %in% names(d))) stop("Minimum columns missing from dataset to be aligned, these are: ", paste(mincold, collapse=", "))
+		mincolm <- mincold[1:4]
+		if(!all(mincolm %in% names(man))) stop("Minimum columns missing from manifest to align dataset to be aligned to, these are: ", paste(mincolm, collapse=", "))
 
-  # Copy both datasets
-  d <- copy(ds)
-  man <- copy(manifest)
+		# Create allele vector for manifest
+		man[,alleles:=paste(REF,ALT, sep="/")][, pid:=paste(CHR38, BP38, sep=":")]
+		d[,REF:=toupper(REF)][,ALT:=toupper(ALT)][,alleles:=paste(REF,ALT,sep="/")][, pid:=paste(CHR38, BP38, sep=":")]
+		M <- merge.data.table(d, man[,.(pid,alleles)], by='pid', suffixes=c(".d",".m"))
+        
+		# Diagnose alleles
+		M[, diag:=g.class(alleles.m, alleles.d)]
+		if(!all(M$diag == "nochange")){	
+	     	    cat("Some SNPs have to be flipped. ", sum(M$diag == "rev"), " to flip, ", sum(M$diag == "comp"), " to find their complement, and ", sum(M$diag == "revcomp"), " to find their reverse complement.\n")
+		    M[, alleles.f:= alleles.d]
+		    M[diag == "rev", alleles.f:= unlist(g.rev(alleles.d))] # Flip reversed alleles
+		    M[diag == "comp", alleles.f:= g.complement(alleles.d)] # Find complement
+		    M[diag == "revcomp", alleles.f:= unlist(g.rev(g.complement(alleles.d)))] # Find rev comp
+		    
+		    # Remove those SNPs that couldn't be successfuly aligned
+		    M[, diag2:=g.class(alleles.m, alleles.f)]
+		    if(!all(M$diag2 == "nochange")){
+	     	    cat("Unfortunately, ", sum(M$diag2 == "ambig"), " SNPs are ambiguous, and ", sum(M$diag2 == "impossible"), " were impossible to align. These will be removed now.\n")
+			M <- M[ diag2 == "nochange"]	
+		    }
+		    
+		    # Now update alleles, BETA, and ALT_FREQ
+		    M[ diag %in% c("rev", "revcomp"), BETA:= -BETA]
+		    if("ALT_FREQ" %in% names(M)){
+		    	M[ diag %in% c("rev", "revcomp"), ALT_FREQ:= 1-ALT_FREQ]
+		    }
+		    M[, c("REF", "ALT") := tstrsplit(alleles.f, "/")] 
+	            M[, c("alleles.f",  "diag2"):=NULL]
+		}
 
-  if(!all(sapply(list(d,man), is.data.table))){
-    d <- data.table(d)
-    man <- data.table(man)
-  }
-  # Sanity checks. We'll require these columns initially
-  mincold <- c("CHR38", "BP38","REF","ALT", "BETA", "SE", "P")
-  if(!all(mincold %in% names(d))) stop("Minimum columns missing from dataset to be aligned, these are: ", paste(mincold, collapse=", "))
-  mincolm <- mincold[1:4]
-  if(!all(mincolm %in% names(man))) stop("Minimum columns missing from manifest to align dataset to be aligned to, these are: ", paste(mincolm, collapse=", "))
-
-  # Create allele vector for manifest
-  man[,alleles:=paste(REF,ALT, sep="/")][, pid:=paste(CHR38, BP38, sep=":")]
-
-  #		if("ALT_FREQ" %in% names(d)) mincold <- c(mincold, "ALT_FREQ") # Include ALT_FREQ, if available
-  #		d <- d[, ..mincold] # Use only relevant columns
-  d[,REF:=toupper(REF)][,ALT:=toupper(ALT)][,alleles:=paste(REF,ALT,sep="/")][, pid:=paste(CHR38, BP38, sep=":")]
-  M <- merge.data.table(d, man[,.(pid,alleles)], by='pid', suffixes=c(".d",".m"))
-
-  # Diagnose alleles
-  M[, diag:=g.class(alleles.m, alleles.d)]
-  if(!all(M$diag == "nochange")){
-    cat("Some SNPs have to be flipped. ", sum(M$diag == "rev"), " to flip, ", sum(M$diag == "comp"), " to find their complement, and ", sum(M$diag == "revcomp"), " to find their reverse complement.\n")
-    M[, alleles.f:= alleles.d]
-    M[diag == "rev", alleles.f:= unlist(g.rev(alleles.d))] # Flip reversed alleles
-    M[diag == "comp", alleles.f:= g.complement(alleles.d)] # Find complement
-    M[diag == "revcomp", alleles.f:= unlist(g.rev(g.complement(alleles.d)))] # Find rev comp
-
-    # Remove those SNPs that couldn't be successfuly aligned
-    M[, diag2:=g.class(alleles.m, alleles.f)]
-    if(!all(M$diag2 == "nochange")){
-      cat("Unfortunately, ", sum(M$diag2 == "ambig"), " SNPs are ambiguous, and ", sum(M$diag2 == "impossible"), " were impossible to align. These will be removed now.\n")
-      M <- M[ diag2 == "nochange"]
-    }
-
-    # Now update alleles, BETA, and ALT_FREQ
-    M[ diag %in% c("rev", "revcomp"), BETA:= -BETA]
-    if("ALT_FREQ" %in% names(M)){
-      M[ diag %in% c("rev", "revcomp"), ALT_FREQ:= 1-ALT_FREQ]
-    }
-    M[, c("REF", "ALT") := tstrsplit(alleles.f, "/")]
-    M[, c("alleles.d", "alleles.m", "alleles.f", "diag", "diag2"):=NULL]
-  }
-
-  M <- unique(M)
-  if(nrow(M) > nrow(man)) warning("Aligned file has more SNPs than the manifest. Some SNPs might be duplicated.")
-  M
+	         M <- unique(M)
+             M[, c("alleles.d", "alleles.m", "diag"):=NULL] # These columns were included regardless of whether alignment as required
+	         if(nrow(M) > nrow(man)) warning("Aligned file has more SNPs than the manifest. Some SNPs might be duplicated.")
+	         M
 }
 
 
