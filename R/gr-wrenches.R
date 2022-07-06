@@ -145,8 +145,11 @@ g.align <- function(ds, manifest){
 		if(!all(mincolm %in% names(man))) stop("Minimum columns missing from manifest to align dataset to be aligned to, these are: ", paste(mincolm, collapse=", "))
 
 		# Create allele vector for manifest
-		man[, alleles := paste(REF,ALT, sep="/")][, pid := paste(CHR38, BP38, sep=":")]
-		d[ , REF := toupper(REF)][, ALT:=toupper(ALT)][, alleles:=paste(REF,ALT,sep="/")][, pid := paste(CHR38, BP38, sep=":")]
+		man[, alleles := paste(REF,ALT, sep="/")]
+		man[, pid := paste(CHR38, BP38, sep=":")]
+		d[ , REF := toupper(REF)][, ALT:=toupper(ALT)]
+		d[, alleles := paste(REF,ALT,sep="/")]
+		d[, pid := paste(CHR38, BP38, sep=":")]
 		M <- merge.data.table(d, man[,.(pid,alleles)], by='pid', suffixes=c(".d",".m"))
         
 		# Diagnose alleles
