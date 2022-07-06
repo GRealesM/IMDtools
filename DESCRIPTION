@@ -5,6 +5,7 @@ Version: 1.0.0
 Author: Guillermo Reales
 Maintainer: Guillermo Reales <gr440@cam.ac.uk>
 Description: Just some wrenches for day to day struggle
+Depends: R (>= 4.0), data.table
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
