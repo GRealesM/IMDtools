@@ -1,6 +1,19 @@
 ## Set of useful functions for file processing and other stuff
 
 
+
+##' Easily plot palette to test colour combinations
+##'
+##' If you have a palette vector (with hexadecimal colour codes), you can simply pass it to this function to visualise it
+##' @title Plot colour palette
+##' @param palette a palette vector with hexadecimal colour codes
+##' @return a plot showing the palette colours
+##' @export
+plot_palette <- function(palette){
+  n <- length(palette)
+  image(1:n, 1, as.matrix(1:n), col = palette, yaxt = "n", xlab="", ylab = "", bty = "n")
+}
+
 ##' Convert effect sizes and standard error from linear to log-odds scale
 ##'
 ##' Binary traits in case-control studies can be analysed by BOLT-LMM, which uses a linear model.
