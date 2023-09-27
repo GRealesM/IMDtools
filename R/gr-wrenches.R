@@ -98,7 +98,7 @@ g.rev <- function (x, sep = "/") {
 #'
 #' @return a diagnostic vector
 #'
-g.class  <- function(x, y, flip_strand=TRUE){
+ g.class  <- function(x, y, flip_strand=TRUE){
   diag <- rep(NA, length(x))
   diag[x == g.rev(y)]  <- "rev"
   diag[x == y] <- "nochange"
@@ -107,7 +107,7 @@ g.class  <- function(x, y, flip_strand=TRUE){
     diag[x == g.rev(g.complement(y))]  <- "revcomp"
     diag[x %in% c("A/T", "T/A", "G/C","C/G")] <- "ambig"
   }
-  diag[x != y && (grepl("-", x) | x %in% c("I/D","D/I"))]  <- "indels"
+  diag[x != y & (grepl("-", x) | x %in% c("I/D","D/I") | grepl("-", y) | y %in% c("I/D","D/I"))]  <- "indels"
   diag[is.na(diag)]  <- "impossible"
   diag
 }
