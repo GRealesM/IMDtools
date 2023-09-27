@@ -2,4 +2,5 @@
 
 export(g.align)
 export(linORscale)
+export(plot_palette)
 export(sdY.correction)
